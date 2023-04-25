@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "account-operations"
+version = "0.1.0"
+description = ""
+authors = ["OlyaEf <efimovskikh@gmail.com>"]
+readme = "README.md"
+packages = [{include = "account_operations"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
