@@ -29,7 +29,7 @@ def format_amount(amount: float, currency: str) -> str:
     return f"{amount:,.2f} {currency}"
 
 
-def format_operation(operation: str, card_number: Optional[str], account: Optional[str], date: str) -> str:
+def format_operation(date: str, operation: str, card_number: Optional[str], account: Optional[str]) -> str:
     """
     Форматирует описание операции.
     """
