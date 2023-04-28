@@ -35,9 +35,13 @@ def load_transactions_from_json(file_path: str) -> List[Transaction]:
     import json
     with open(file_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
+    return convert_transactions(data)
+
+
+def convert_transactions(data: List[dict]) -> List[Transaction]:
     transactions = []
     for item in data:
-        if 'from' in item:
+        if 'from' in item and item['state'] == 'EXECUTED':
             transactions.append(Transaction(
                 id=item['id'],
                 state=item['state'],
