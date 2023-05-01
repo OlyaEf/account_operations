@@ -1,7 +1,4 @@
-import json
-
 import pytest
-from _pytest import tmpdir
 
 from src.transaction import Transaction
 
