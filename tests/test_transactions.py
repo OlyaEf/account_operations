@@ -1,14 +1,24 @@
-import os
+import json
+from datetime import datetime
+from unittest import mock
 
-import pytest
+from src.transaction import convert_transactions, get_last_transactions, load_transactions_from_json, Transaction
 
 
-from src.transaction import convert_transactions, Transaction
+def test_convert_transactions(data_transactions, valid_transaction):
+    transactions = convert_transactions(data_transactions)
+    assert transactions[0] == valid_transaction
 
 
-@pytest.fixture
-def data_transactions():
-    return [
+def test_get_last_transactions(transactions):
+    last_transactions = get_last_transactions(transactions, count=3)
+    assert len(last_transactions) == 3
+    sort_transactions = sorted(transactions, key=lambda t: datetime.fromisoformat(t.date), reverse=True)
+    assert last_transactions == sort_transactions[:3]
+
+
+def test_load_transactions_from_json(tmp_path):
+    test_data = [
         {
             "id": 921286598,
             "state": "EXECUTED",
@@ -23,39 +33,22 @@ def data_transactions():
             "description": "Перевод организации",
             "from": "Счет 26406253703545413262",
             "to": "Счет 20735820461482021315"
-        },
-        {
-            "id": 207126257,
-            "state": "EXECUTED",
-            "date": "2019-07-15T11:47:40.496961",
-            "operationAmount": {
-                "amount": "92688.46",
-                "currency": {
-                    "name": "USD",
-                    "code": "USD"
-                }
-            },
-            "description": "Открытие вклада",
-            "to": "Счет 35737585785074382265"
-        },
+        }
     ]
+    test_file = tmp_path / "test.json"
+    with open(test_file, "w") as f:
+        json.dump(test_data, f)
+    expected_transactions = [
+        Transaction(
+            id=921286598,
+            state="EXECUTED",
+            date="2018-03-09T23:57:37.537412",
+            amount=25780.71,
+            currency="руб.",
+            description="Перевод организации",
+            from_account="Счет 26406253703545413262",
+            to_account="Счет 20735820461482021315"
+        )
+    ]
+    assert load_transactions_from_json(str(test_file)) == expected_transactions
 
-
-@pytest.fixture()
-def valid_transaction(data_transactions):
-    item = data_transactions[0]
-    return Transaction(
-                id=item['id'],
-                state=item['state'],
-                date=item['date'],
-                amount=float(item['operationAmount']['amount']),
-                currency=item['operationAmount']['currency']['name'],
-                description=item['description'],
-                from_account=item["from"],
-                to_account=item['to']
-            )
-
-
-def test_convert_transactions(data_transactions, valid_transaction):
-    transactions = convert_transactions(data_transactions)
-    assert transactions[0] == valid_transaction
